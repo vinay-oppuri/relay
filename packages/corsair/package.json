@@ -1,0 +1,29 @@
+{
+  "name": "@repo/corsair",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0"
+  },
+  "dependencies": {
+    "@corsair-dev/github": "^0.1.14",
+    "@repo/db": "workspace:*",
+    "corsair": "^0.1.108"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.15.3",
+    "eslint": "^9.39.1",
+    "typescript": "5.9.2"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  }
+}

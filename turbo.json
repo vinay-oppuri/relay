@@ -1,0 +1,30 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "globalEnv": [
+    "ANTHROPIC_API_KEY",
+    "CORSAIR_DEV_API_KEY",
+    "CORSAIR_DEV_SIGNING_SECRET",
+    "CORSAIR_KEK",
+    "DATABASE_URL",
+    "GOOGLE_GENERATIVE_AI_API_KEY",
+    "OPENAI_API_KEY"
+  ],
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}
