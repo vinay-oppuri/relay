@@ -4,10 +4,12 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 
 import { users } from "./auth";
+import type { IntegrationProvider } from "../domain";
 
 export const connections = pgTable(
   "connections",
@@ -16,9 +18,12 @@ export const connections = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    provider: text("provider").notNull(),
+    provider: text("provider").$type<IntegrationProvider>().notNull(),
+    corsairTenantId: text("corsair_tenant_id").notNull(),
     externalAccountId: text("external_account_id"),
-    status: text("status").default("active").notNull(),
+    displayName: text("display_name"),
+    status: text("status").default("pending").notNull(),
+    lastSyncedAt: timestamp("last_synced_at", { withTimezone: true }),
     metadata: jsonb("metadata")
       .$type<Record<string, unknown>>()
       .default({})
@@ -31,8 +36,13 @@ export const connections = pgTable(
       .notNull(),
   },
   (table) => [
+    uniqueIndex("connections_user_provider_tenant_unique").on(
+      table.userId,
+      table.provider,
+      table.corsairTenantId,
+    ),
     index("connections_user_id_idx").on(table.userId),
-    index("connections_provider_idx").on(table.provider),
+    index("connections_provider_status_idx").on(table.provider, table.status),
   ],
 );
 

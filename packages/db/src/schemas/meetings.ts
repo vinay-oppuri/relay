@@ -8,8 +8,8 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { users } from "./auth";
 import { connections } from "./connections";
+import { users } from "./auth";
 
 export type MeetingAttendee = {
   email: string;
@@ -29,15 +29,21 @@ export const meetings = pgTable(
     }),
     provider: text("provider").notNull(),
     externalId: text("external_id").notNull(),
+    emailThreadId: text("email_thread_id"),
     title: text("title").notNull(),
     description: text("description"),
+    location: text("location"),
     startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
     endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
     attendees: jsonb("attendees")
       .$type<MeetingAttendee[]>()
       .default([])
       .notNull(),
+    prepContext: jsonb("prep_context").$type<Record<string, unknown>>(),
     prepSummary: text("prep_summary"),
+    prepSentAt: timestamp("prep_sent_at", { withTimezone: true }),
+    recap: text("recap"),
+    recapSentAt: timestamp("recap_sent_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -46,7 +52,8 @@ export const meetings = pgTable(
       .notNull(),
   },
   (table) => [
-    uniqueIndex("meetings_provider_external_unique").on(
+    uniqueIndex("meetings_user_provider_external_unique").on(
+      table.userId,
       table.provider,
       table.externalId,
     ),
