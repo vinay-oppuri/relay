@@ -4,10 +4,11 @@ export {
   type DraftReplyResult,
 } from "./draft-reply";
 export {
-  createPrepSummary,
-  type PrepSummaryInput,
-  type PrepSummaryResult,
-} from "./prep-summary";
+  answerMailQuestion,
+  type AnswerMailQuestionInput,
+  type AnswerMailQuestionResult,
+  type MailAnswerSource,
+} from "./answer-mail-question";
 export {
   assertWithinUsageCap,
   getUsageCapStatus,

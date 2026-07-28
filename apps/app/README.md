@@ -1,8 +1,8 @@
 # Relay application
 
-The authenticated Relay product application is a Next.js App Router project.
-Authentication is handled by Better Auth with Google OAuth, passwordless email
-OTP sessions, and user-scoped data.
+The authenticated Relay product application is a chat/inbox assistant for
+Gmail and Google Calendar. Authentication is handled by Better Auth with Google
+OAuth, passwordless email OTP sessions, and user-scoped data.
 
 ## Local setup
 
@@ -10,7 +10,8 @@ From the repository root:
 
 1. Copy `apps/app/.env.example` to `apps/app/.env.local` and replace the
    development values.
-2. Create the PostgreSQL database named in `DATABASE_URL`.
+2. Create the PostgreSQL database named in `DATABASE_URL`. The initial
+   migration enables the `pgvector` extension used for mail embeddings.
 3. Apply the generated Drizzle migrations:
 
    ```bash
@@ -23,15 +24,16 @@ From the repository root:
    pnpm dev:app
    ```
 
-The application runs at `http://localhost:3000` by default.
+The application runs at `http://localhost:3001` by default so it can run beside
+the marketing site on port 3000.
 
 ## Authentication flow
 
 - `/login` signs in existing users or creates an account on first use through
   Google OAuth or a one-time email code.
 - `/onboarding` selects the user's niche template.
-- `/` is the product dashboard and requires a valid session plus a selected
-  niche template.
+- `/` is the assistant/inbox screen and requires a valid session plus a
+  selected niche template.
 - `/api/auth/[...all]` exposes the Better Auth route handler.
 
 Set `BETTER_AUTH_URL` to the application origin in every environment and use a

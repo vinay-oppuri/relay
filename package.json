@@ -7,8 +7,10 @@
     "dev:web": "turbo run dev --filter=web",
     "dev:app": "turbo run dev --filter=app",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "format": "prettier --write . --ignore-unknown",
+    "format:check": "prettier --check . --ignore-unknown",
+    "check-types": "turbo run check-types",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "prettier": "^3.7.4",
@@ -17,10 +19,6 @@
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {
-    "node": ">=18"
-  },
-  "dependencies": {
-    "lucide-react": "^1.27.0",
-    "next-themes": "^0.4.6"
+    "node": ">=22"
   }
 }

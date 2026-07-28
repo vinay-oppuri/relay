@@ -4,15 +4,15 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./client": "./src/client.ts"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit",
     "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
-    "@corsair-dev/github": "^0.1.14",
+    "@corsair-dev/gmail": "^0.1.4",
+    "@corsair-dev/googlecalendar": "^0.1.5",
     "@repo/db": "workspace:*",
     "corsair": "^0.1.108"
   },

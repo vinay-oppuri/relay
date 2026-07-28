@@ -1,4 +1,5 @@
-import { github } from "@corsair-dev/github";
+import { gmail } from "@corsair-dev/gmail";
+import { googlecalendar } from "@corsair-dev/googlecalendar";
 import { pool } from "@repo/db";
 import { createCorsair } from "corsair";
 
@@ -20,7 +21,8 @@ function createRelayCorsair() {
       projectApiKey: requiredEnv("CORSAIR_DEV_API_KEY"),
       signingSecret: requiredEnv("CORSAIR_DEV_SIGNING_SECRET"),
     },
-    plugins: [github({ authType: "managed" })],
+    plugins: [gmail(), googlecalendar()],
+    multiTenancy: true,
   });
 }
 

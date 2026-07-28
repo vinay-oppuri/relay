@@ -6,21 +6,23 @@ import type { LanguageModel } from "ai";
 export type AIProvider = "anthropic" | "gemini" | "openai";
 
 export type ModelSelection = {
+  apiKey: string;
   provider?: AIProvider;
   modelId?: string;
 };
 
 export function getModel({
+  apiKey,
   provider = "openai",
   modelId,
-}: ModelSelection = {}): LanguageModel {
+}: ModelSelection): LanguageModel {
   switch (provider) {
     case "anthropic":
-      return getAnthropicModel(modelId);
+      return getAnthropicModel(apiKey, modelId);
     case "gemini":
-      return getGeminiModel(modelId);
+      return getGeminiModel(apiKey, modelId);
     case "openai":
-      return getOpenAIModel(modelId);
+      return getOpenAIModel(apiKey, modelId);
   }
 }
 

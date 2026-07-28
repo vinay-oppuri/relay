@@ -12,17 +12,30 @@ export const INTEGRATION_PROVIDERS = [
 ] as const;
 export type IntegrationProvider = (typeof INTEGRATION_PROVIDERS)[number];
 
-export const WORKFLOW_STATUSES = ["draft", "active", "paused"] as const;
-export type WorkflowStatus = (typeof WORKFLOW_STATUSES)[number];
+export const MAIL_URGENCY_LEVELS = ["low", "normal", "high", "urgent"] as const;
+export type MailUrgency = (typeof MAIL_URGENCY_LEVELS)[number];
+
+export const CHAT_MESSAGE_ROLES = ["user", "assistant", "tool"] as const;
+export type ChatMessageRole = (typeof CHAT_MESSAGE_ROLES)[number];
+
+export const SCHEDULING_REQUEST_STATUSES = [
+  "detected",
+  "awaiting-selection",
+  "confirmed",
+  "booked",
+  "dismissed",
+  "failed",
+] as const;
+export type SchedulingRequestStatus =
+  (typeof SCHEDULING_REQUEST_STATUSES)[number];
 
 export const PENDING_ACTION_STATUSES = [
-  "pending",
-  "approved",
-  "rejected",
+  "draft",
+  "confirmed",
   "executing",
   "executed",
+  "cancelled",
   "failed",
-  "expired",
 ] as const;
 export type PendingActionStatus = (typeof PENDING_ACTION_STATUSES)[number];
 

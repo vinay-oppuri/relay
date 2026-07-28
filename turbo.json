@@ -1,13 +1,17 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "globalEnv": [
-    "ANTHROPIC_API_KEY",
+    "AUTH_EMAIL_FROM",
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL",
     "CORSAIR_DEV_API_KEY",
     "CORSAIR_DEV_SIGNING_SECRET",
     "CORSAIR_KEK",
     "DATABASE_URL",
-    "GOOGLE_GENERATIVE_AI_API_KEY",
-    "OPENAI_API_KEY"
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "NEXT_PUBLIC_APP_URL",
+    "RESEND_API_KEY"
   ],
   "ui": "tui",
   "tasks": {
@@ -21,6 +25,9 @@
     },
     "check-types": {
       "dependsOn": ["^check-types"]
+    },
+    "test": {
+      "dependsOn": ["^test"]
     },
     "dev": {
       "cache": false,

@@ -5,31 +5,31 @@ import { Button, cn } from "@repo/ui";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
-const templates = [
+const onboardingTemplates = [
   {
     id: "recruiter",
     title: "Recruiter",
-    description: "Interview scheduling",
+    description: "Candidate context",
     details:
-      "Prepare candidate context, coordinate interview panels, and keep follow-ups moving.",
+      "Prioritize candidate context when summarizing threads or preparing for interviews.",
   },
   {
     id: "sales",
     title: "Sales / SDR",
-    description: "Meeting coordination",
+    description: "Deal context",
     details:
-      "Bring account context into discovery calls and turn conversations into clear next steps.",
+      "Surface the account details that matter in deal threads and discovery calls.",
   },
   {
     id: "solo-founder",
     title: "Solo founder / Consultant",
-    description: "Chief-of-staff workflow",
+    description: "Client context",
     details:
-      "Stay ahead of customer and partner meetings with prep bullets and daily summaries.",
+      "Retrieve useful context across customer, partner, and client conversations.",
   },
 ] as const;
 
-type NicheTemplate = (typeof templates)[number]["id"];
+type NicheTemplate = (typeof onboardingTemplates)[number]["id"];
 
 export function OnboardingForm() {
   const router = useRouter();
@@ -59,7 +59,7 @@ export function OnboardingForm() {
       <fieldset className="space-y-3" disabled={pending}>
         <legend className="sr-only">Choose your Relay template</legend>
         <div className="grid gap-3 sm:grid-cols-3">
-          {templates.map((option) => (
+          {onboardingTemplates.map((option) => (
             <label
               key={option.id}
               className={cn(

@@ -8,8 +8,9 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { users } from "./auth";
+import { pendingActions } from "./actions";
 import { aiUsageEvents } from "./ai";
-import { workflows } from "./workflows";
+import { chatMessages } from "./chat";
 
 export const auditLogs = pgTable(
   "audit_logs",
@@ -18,9 +19,14 @@ export const auditLogs = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    workflowId: uuid("workflow_id").references(() => workflows.id, {
-      onDelete: "set null",
-    }),
+    pendingActionId: uuid("pending_action_id").references(
+      () => pendingActions.id,
+      { onDelete: "set null" },
+    ),
+    sourceMessageId: uuid("source_message_id").references(
+      () => chatMessages.id,
+      { onDelete: "set null" },
+    ),
     eventType: text("event_type").notNull(),
     entityType: text("entity_type").notNull(),
     entityId: text("entity_id"),
@@ -45,6 +51,7 @@ export const auditLogs = pgTable(
       table.entityType,
       table.entityId,
     ),
+    index("audit_logs_pending_action_idx").on(table.pendingActionId),
   ],
 );
 

@@ -8,15 +8,16 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { users } from "./auth";
-import { connections } from "./connections";
-import { meetings } from "./meetings";
-import { workflows } from "./workflows";
 import type {
   ActionType,
   IntegrationProvider,
   PendingActionStatus,
 } from "../domain";
+import { users } from "./auth";
+import { chatMessages } from "./chat";
+import { connections } from "./connections";
+import { mailItems } from "./mail";
+import { schedulingRequests } from "./scheduling";
 
 export const pendingActions = pgTable(
   "pending_actions",
@@ -25,36 +26,34 @@ export const pendingActions = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    workflowId: uuid("workflow_id").references(() => workflows.id, {
+    sourceMessageId: uuid("source_message_id").references(
+      () => chatMessages.id,
+      { onDelete: "set null" },
+    ),
+    mailItemId: uuid("mail_item_id").references(() => mailItems.id, {
       onDelete: "set null",
     }),
-    meetingId: uuid("meeting_id").references(() => meetings.id, {
-      onDelete: "set null",
-    }),
+    schedulingRequestId: uuid("scheduling_request_id").references(
+      () => schedulingRequests.id,
+      { onDelete: "set null" },
+    ),
     connectionId: uuid("connection_id").references(() => connections.id, {
       onDelete: "set null",
     }),
     actionType: text("action_type").$type<ActionType>().notNull(),
     integration: text("integration").$type<IntegrationProvider>().notNull(),
-    title: text("title").notNull(),
     status: text("status")
       .$type<PendingActionStatus>()
-      .default("pending")
+      .default("draft")
       .notNull(),
-    riskLevel: text("risk_level").default("sensitive").notNull(),
-    originalPayload: jsonb("original_payload")
-      .$type<Record<string, unknown>>()
-      .notNull(),
-    editedPayload: jsonb("edited_payload").$type<Record<string, unknown>>(),
+    payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
     previewText: text("preview_text"),
-    rejectionReason: text("rejection_reason"),
     idempotencyKey: text("idempotency_key").notNull(),
-    requestedAt: timestamp("requested_at", { withTimezone: true })
+    confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
+    executedAt: timestamp("executed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
-    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
-    executedAt: timestamp("executed_at", { withTimezone: true }),
-    expiresAt: timestamp("expires_at", { withTimezone: true }),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -64,13 +63,8 @@ export const pendingActions = pgTable(
       table.userId,
       table.idempotencyKey,
     ),
-    index("pending_actions_user_status_requested_idx").on(
-      table.userId,
-      table.status,
-      table.requestedAt,
-    ),
-    index("pending_actions_workflow_id_idx").on(table.workflowId),
-    index("pending_actions_meeting_id_idx").on(table.meetingId),
+    index("pending_actions_user_status_idx").on(table.userId, table.status),
+    index("pending_actions_source_message_idx").on(table.sourceMessageId),
   ],
 );
 
