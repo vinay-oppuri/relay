@@ -8,13 +8,15 @@
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --max-warnings 0",
+    "test": "node --test src/*.test.ts"
   },
   "dependencies": {
     "@corsair-dev/gmail": "^0.1.4",
     "@corsair-dev/googlecalendar": "^0.1.5",
     "@repo/db": "workspace:*",
-    "corsair": "^0.1.108"
+    "corsair": "^0.1.108",
+    "drizzle-orm": "1.0.0-rc.4"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

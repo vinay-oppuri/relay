@@ -1,8 +1,14 @@
 import { toNextJsHandler, type ManagementHandlerOptions } from "corsair";
 
-import { getCorsair } from "./corsair";
+import { ensureCorsairIntegrationCredentials, getCorsair } from "./corsair";
+import { isCorsairDeliveryRequest } from "./corsair-request";
 
-export { getCorsair, type RelayCorsair } from "./corsair";
+export {
+  ensureCorsairIntegrationCredentials,
+  getCorsair,
+  type RelayCorsair,
+} from "./corsair";
+export { syncGmailMessages } from "./gmail-sync";
 
 type RelayHandlerOptions = ManagementHandlerOptions & {
   getTenantId: (request: Request) => Promise<string | null>;
@@ -14,14 +20,54 @@ export function createCorsairNextHandlers({
 }: RelayHandlerOptions) {
   const handle =
     (method: "GET" | "OPTIONS" | "POST") => async (request: Request) => {
+      const basePath = options.basePath ?? "/api/corsair";
+      const pathname = new URL(request.url).pathname.replace(/\/$/, "");
+
+      if (isCorsairDeliveryRequest(request, basePath)) {
+        return toNextJsHandler(getCorsair(), options)[method](request);
+      }
+
       const tenantId = await getTenantId(request);
 
       if (!tenantId) {
         return Response.json({ error: "unauthorized" }, { status: 401 });
       }
 
-      const corsair = getCorsair().withTenant(tenantId);
-      return toNextJsHandler(corsair, options)[method](request);
+      await ensureCorsairIntegrationCredentials();
+
+      const corsair = getCorsair();
+
+      try {
+        if (method === "GET" && pathname === `${basePath}/connection-status`) {
+          return Response.json(
+            await corsair.manage.connectionStatus.get({ tenantId }),
+          );
+        }
+
+        if (method === "POST" && pathname === `${basePath}/connect/links`) {
+          return Response.json(
+            await corsair.manage.connect.createLink({
+              plugin: "gmail",
+              tenantId,
+              oauthMode: "byo",
+            }),
+          );
+        }
+      } catch (error) {
+        console.error("Corsair management request failed", error);
+        return Response.json(
+          {
+            error: "corsair_request_failed",
+            message:
+              error instanceof Error
+                ? error.message
+                : "Could not complete the Corsair request.",
+          },
+          { status: 502 },
+        );
+      }
+
+      return Response.json({ error: "not_found" }, { status: 404 });
     };
 
   return {

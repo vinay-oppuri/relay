@@ -20,6 +20,7 @@ import {
 import { Inbox, MessageSquare, Sparkles } from "lucide-react";
 
 import type { AssistantOverview } from "../../server/get-assistant-overview";
+import { GmailSyncButton } from "../components/gmail-sync-button";
 
 const suggestions = [
   "What is important in my inbox today?",
@@ -124,15 +125,20 @@ export function AssistantView({
           </div>
 
           <div className="mx-auto mt-8 w-full max-w-3xl">
-            {!assistantReady ? (
-              <p className="mb-2 text-xs text-muted-foreground">
-                {!gmailReady
-                  ? "Connect Gmail to start syncing your inbox."
-                  : !aiReady
-                    ? "Add an AI provider key to ask Relay questions."
-                    : "Your first mail sync is still in progress."}
-              </p>
-            ) : null}
+            <div className="mb-3 flex items-end justify-between gap-4">
+              {!assistantReady ? (
+                <p className="text-xs text-muted-foreground">
+                  {!gmailReady
+                    ? "Connect Gmail to start syncing your inbox."
+                    : !aiReady
+                      ? "Add an AI provider key to ask Relay questions."
+                      : "Your first mail sync is still in progress."}
+                </p>
+              ) : (
+                <span />
+              )}
+              <GmailSyncButton connected={gmailReady} />
+            </div>
             <AIPrompt
               className="w-full py-0"
               disabled={!assistantReady}
