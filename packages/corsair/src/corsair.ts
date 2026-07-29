@@ -47,19 +47,27 @@ export function ensureCorsairIntegrationCredentials() {
 
     await setupCorsair(corsair, { silent: true });
 
-    const [storedClientId, storedClientSecret] = await Promise.all([
-      corsair.keys.gmail.get_client_id(),
-      corsair.keys.gmail.get_client_secret(),
-    ]);
+    for (const keys of [
+      corsair.keys.gmail,
+      corsair.keys.googlecalendar,
+    ]) {
+      const [storedClientId, storedClientSecret] = await Promise.all([
+        keys.get_client_id(),
+        keys.get_client_secret(),
+      ]);
 
-    if (storedClientId !== clientId) {
-      await corsair.keys.gmail.set_client_id(clientId);
-    }
+      if (storedClientId !== clientId) {
+        await keys.set_client_id(clientId);
+      }
 
-    if (storedClientSecret !== clientSecret) {
-      await corsair.keys.gmail.set_client_secret(clientSecret);
+      if (storedClientSecret !== clientSecret) {
+        await keys.set_client_secret(clientSecret);
+      }
     }
-  })();
+  })().catch((error: unknown) => {
+    corsairCredentialsPromise = undefined;
+    throw error;
+  });
 
   return corsairCredentialsPromise;
 }

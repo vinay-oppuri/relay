@@ -8,7 +8,7 @@ export {
   getCorsair,
   type RelayCorsair,
 } from "./corsair";
-export { syncGmailMessages } from "./gmail-sync";
+export { syncGmailMessages } from "./plugins/gmail-sync";
 
 type RelayHandlerOptions = ManagementHandlerOptions & {
   getTenantId: (request: Request) => Promise<string | null>;
@@ -18,9 +18,10 @@ export function createCorsairNextHandlers({
   getTenantId,
   ...options
 }: RelayHandlerOptions) {
+  const basePath = (options.basePath ?? "/api/corsair").replace(/\/$/, "");
+
   const handle =
     (method: "GET" | "OPTIONS" | "POST") => async (request: Request) => {
-      const basePath = options.basePath ?? "/api/corsair";
       const pathname = new URL(request.url).pathname.replace(/\/$/, "");
 
       if (isCorsairDeliveryRequest(request, basePath)) {
@@ -58,10 +59,7 @@ export function createCorsairNextHandlers({
         return Response.json(
           {
             error: "corsair_request_failed",
-            message:
-              error instanceof Error
-                ? error.message
-                : "Could not complete the Corsair request.",
+            message: "Could not complete the Corsair request.",
           },
           { status: 502 },
         );

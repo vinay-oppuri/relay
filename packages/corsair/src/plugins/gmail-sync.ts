@@ -1,7 +1,7 @@
 import { connections, db, mailItems, type NewMailItem } from "@repo/db";
 import { and, eq, sql } from "drizzle-orm";
 
-import { getCorsair } from "./corsair";
+import { getCorsair } from "../corsair";
 import { normalizeGmailMessage } from "./gmail-message";
 
 const PAGE_SIZE = 50;

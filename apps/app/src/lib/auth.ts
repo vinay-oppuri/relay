@@ -4,38 +4,8 @@ import { betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { emailOTP } from "better-auth/plugins";
-
-function requiredEnv(name: string) {
-  const value = process.env[name];
-
-  if (!value) {
-    throw new Error(`${name} is required.`);
-  }
-
-  return value;
-}
-
-async function sendSignInCode(email: string, otp: string) {
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${requiredEnv("RESEND_API_KEY")}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: requiredEnv("AUTH_EMAIL_FROM"),
-      to: [email],
-      subject: "Your Relay sign-in code",
-      text: `Your Relay sign-in code is ${otp}. It expires in 10 minutes.`,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `OTP email delivery failed with status ${response.status}.`,
-    );
-  }
-}
+import { requiredEnv } from "./req-env";
+import { sendSignInCode } from "./resend-mail";
 
 export const auth = betterAuth({
   appName: "Relay",

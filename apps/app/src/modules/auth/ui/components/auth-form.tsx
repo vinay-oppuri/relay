@@ -1,7 +1,7 @@
 "use client";
 
 import { safeNextPath } from "@/lib/auth-path";
-import { authClient } from "@/lib/auth-client";
+import { emailOtp, signIn } from "@/lib/auth-client";
 import { Button } from "@repo/ui";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
@@ -19,14 +19,21 @@ export function AuthForm() {
     setError(null);
     setPending(true);
 
-    const result = await authClient.signIn.social({
-      provider: "google",
-      callbackURL: destination,
-      errorCallbackURL: "/login",
-    });
+    try {
+      const result = await signIn.social({
+        provider: "google",
+        callbackURL: destination,
+        errorCallbackURL: "/login",
+      });
 
-    if (result.error) {
-      setError(result.error.message ?? "Google sign-in failed.");
+      if (result?.error) {
+        setError(result.error.message ?? "Google sign-in failed.");
+        return;
+      }
+    } catch (error) {
+      console.error("Google sign-in error:", error);
+      setError("Something went wrong while signing in with Google.");
+    } finally {
       setPending(false);
     }
   }
@@ -35,22 +42,27 @@ export function AuthForm() {
     event.preventDefault();
     setError(null);
     setPending(true);
-    const normalizedEmail = email.trim().toLowerCase();
 
-    const result = await authClient.emailOtp.sendVerificationOtp({
-      email: normalizedEmail,
-      type: "sign-in",
-    });
+    try {
+      const normalizedEmail = email.trim().toLowerCase();
+      const result = await emailOtp.sendVerificationOtp({
+        email: normalizedEmail,
+        type: "sign-in",
+      });
 
-    if (result.error) {
-      setError(result.error.message ?? "Could not send a sign-in code.");
+      if (result.error) {
+        setError(result.error.message ?? "Could not send a sign-in code.");
+        return;
+      }
+
+      setEmail(normalizedEmail);
+      setOtpSent(true);
+    } catch (error) {
+      console.error("OTP request failed:", error);
+      setError("Something went wrong. Please try again.");
+    } finally {
       setPending(false);
-      return;
     }
-
-    setEmail(normalizedEmail);
-    setOtpSent(true);
-    setPending(false);
   }
 
   async function verifyCode(event: FormEvent<HTMLFormElement>) {
@@ -58,28 +70,31 @@ export function AuthForm() {
     setError(null);
     setPending(true);
 
-    const formData = new FormData(event.currentTarget);
-    const otp = String(formData.get("otp") ?? "").trim();
-    const localPart = email.split("@")[0] ?? "";
-    // ponytail: This placeholder avoids a separate profile step; replace it
-    // with an editable display name when user profiles are introduced.
-    const name = localPart.replace(/[._-]+/g, " ").trim() || "Relay user";
-    const result = await authClient.signIn.emailOtp({
-      email,
-      otp,
-      name,
-    });
+    try {
+      const formData = new FormData(event.currentTarget);
+      const otp = String(formData.get("otp") ?? "").trim();
+      const localPart = email.split("@")[0] ?? "";
+      const name = localPart.replace(/[._-]+/g, " ").trim() || "Relay user";
+      const result = await signIn.emailOtp({
+        email,
+        otp,
+        name,
+      });
 
-    if (result.error) {
-      setError(result.error.message ?? "That code is invalid or expired.");
+      if (result.error) {
+        setError(result.error.message ?? "That code is invalid or expired.");
+        return;
+      }
+
+      router.replace(destination);
+      router.refresh();
+    } catch (error) {
+      console.error("OTP verification failed:", error);
+      setError("Something went wrong. Please try again.");
+    } finally {
       setPending(false);
-      return;
     }
-
-    router.replace(destination);
-    router.refresh();
   }
-
   return (
     <div className="space-y-5">
       <Button

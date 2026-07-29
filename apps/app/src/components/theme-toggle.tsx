@@ -13,8 +13,8 @@ const ThemeToggle = () => {
       className="rounded-md border p-2 transition hover:bg-muted"
       aria-label="Toggle color theme"
     >
-      <Sun className="hidden size-5 dark:block" aria-hidden="true" />
-      <Moon className="size-5 dark:hidden" aria-hidden="true" />
+      <Sun className="hidden size-4 dark:block" aria-hidden="true" />
+      <Moon className="size-4 dark:hidden" aria-hidden="true" />
     </button>
   );
 };

@@ -10,3 +10,5 @@ import {
 export const authClient = createAuthClient({
   plugins: [inferAdditionalFields<typeof auth>(), emailOTPClient()],
 });
+
+export const {signIn, signOut, emailOtp} = authClient;
